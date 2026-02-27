@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>داشبورد</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h2>📊 داشبورد مدیریتی</h2>
+
+<div class="card">💰 درآمد کل: <span id="income"></span></div>
+<div class="card">📦 تعداد سفارش: <span id="ordersCount"></span></div>
+<div class="card">👥 تعداد کاربران: <span id="usersCount"></span></div>
+<div class="card">🔥 بازدید کل: <span id="viewsCount"></span></div>
+
+<canvas id="salesChart" style="margin-top:20px;"></canvas>
+<canvas id="dailyChart" style="margin-top:20px;"></canvas>
+
+<script>
+if(localStorage.getItem("admin")!=="true"){
+alert("دسترسی ندارید ❌");
+location.href="index.html";
+}
+
+function loadDashboard(){
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let views = JSON.parse(localStorage.getItem("views")) || {};
+
+let totalIncome=0;
+orders.forEach(o=>o.items.forEach(i=>totalIncome+=i.price));
+
+document.getElementById("income").innerText = totalIncome.toLocaleString() + " تومان";
+document.getElementById("ordersCount").innerText = orders.length;
+document.getElementById("usersCount").innerText = users.length;
+document.getElementById("viewsCount").innerText = Object.values(views).reduce((a,b)=>a+b,0);
+
+let ctx = document.getElementById("salesChart");
+new Chart(ctx,{
+type:"bar",
+data:{
+labels:["فروش","سفارش","کاربر"],
+datasets:[{label:"آمار فروشگاه",data:[totalIncome,orders.length,users.length],backgroundColor:["#1976d2","#ff9800","#4caf50"]}]
+}
+});
+
+let days=[];
+for(let i=0;i<30;i++){
+let d=new Date(); d.setDate(d.getDate()-i); days.unshift(d.toISOString().slice(0,10));
+}
+
+let dailyData = days.map(day=>{
+let total=0; orders.forEach(o=>{if(o.date.slice(0,10)===day){o.items.forEach(it=>total+=it.price);}}); return total;
+});
+
+let ctx2 = document.getElementById("dailyChart");
+new Chart(ctx2,{type:"line",data:{labels:days,datasets:[{label:"فروش روزانه",data:dailyData,borderColor:"#1976d2",backgroundColor:"rgba(25,118,210,0.2)",fill:true,tension:0.3}]}});
+
+setInterval(()=>{
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+let lastCheck = localStorage.getItem("lastOrderCheck") || 0;
+if(orders.length>lastCheck){alert("📢 سفارش جدید ثبت شد!");localStorage.setItem("lastOrderCheck",orders.length);}
+},5000);
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>

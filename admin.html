@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>پنل مدیریت</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">
+<h2>پنل مدیریت</h2>
+<a href="index.html">بازگشت</a>
+</div>
+
+<input type="text" id="name" placeholder="نام محصول">
+<input type="number" id="price" placeholder="قیمت">
+<input type="number" id="stock" placeholder="موجودی">
+<button onclick="addProduct()">افزودن محصول</button>
+
+<script>
+function addProduct(){
+let products=JSON.parse(localStorage.getItem("products"))||[];
+let product={
+name:document.getElementById("name").value,
+price:document.getElementById("price").value,
+stock:document.getElementById("stock").value
+};
+products.push(product);
+localStorage.setItem("products",JSON.stringify(products));
+alert("محصول اضافه شد ✅");
+}
+</script>
+
+</body>
+</html>

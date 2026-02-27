@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پروفایل من</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>👤 پروفایل من</h2>
+<p id="username"></p>
+<h3>📦 سفارش‌های من</h3>
+<div id="myOrders"></div>
+
+<script>
+let user = localStorage.getItem("currentUser") || "ناشناس";
+document.getElementById("username").innerText = "نام کاربری: "+user;
+
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+let myOrders = orders.filter(o=>o.user===user);
+let box = document.getElementById("myOrders");
+myOrders.forEach(o=>{
+box.innerHTML += `<div class="card">🛍 تعداد: ${o.items.length}<br>📅 ${o.date}</div>`;
+});
+</script>
+
+</body>
+</html>
